@@ -19,9 +19,10 @@ __all__ = ['get_color', 'parse_unittest_result_verbose',
 DEFAULT_CONFIG_PATH = "/home/%s/.pyrgrc" % (pwd.getpwuid(os.getuid())[0])
 PRINT_COLOR_SET_DEFAULT = {
         'ok': 'green',
+        'skipped': 'cyan',
         'fail': 'red',
         'error': 'yellow',
-        'function': 'cyan',
+        'function': 'lightblue',
 }
 PRINT_COLOR_SET = PRINT_COLOR_SET_DEFAULT.copy()
 COLOR_MAP = {
@@ -134,6 +135,7 @@ def parse_unittest_result(lines):
 def parse_unittest_result_verbose(lines):
     """parse test result, verbose print mode."""
     ok = re.compile("ok$")
+    skipped = re.compile("skipped '[^']+'")
     fail = re.compile("FAIL$")
     err = re.compile("ERROR$")
     fail_verbose = re.compile("FAIL:")
@@ -145,6 +147,10 @@ def parse_unittest_result_verbose(lines):
         if ok.search(line):
             tmp = ok.split(line)
             result = tmp[0] + get_color('ok') % "ok" + "\n"
+        elif skipped.search(line):
+            delimiter = ' ... '
+            tmp = line.split(delimiter)
+            result = tmp[0] + delimiter + get_color('skipped') % tmp[1]
         elif fail.search(line):
             tmp = fail.split(line)
             result = tmp[0] + get_color('fail') % "FAIL" + "\n"
